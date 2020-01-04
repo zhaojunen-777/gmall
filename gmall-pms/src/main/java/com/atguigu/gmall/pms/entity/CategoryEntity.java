@@ -11,9 +11,9 @@ import lombok.Data;
 /**
  * 商品三级分类
  * 
- * @author lixianfeng
- * @email lxf@atguigu.com
- * @date 2019-12-31 09:59:59
+ * @author zje
+ * @email zje@atguigu.com
+ * @date 2020-01-02 16:30:31
  */
 @ApiModel
 @Data
