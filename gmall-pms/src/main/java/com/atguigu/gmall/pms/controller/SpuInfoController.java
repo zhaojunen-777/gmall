@@ -1,22 +1,23 @@
 package com.atguigu.gmall.pms.controller;
 
-import java.util.Arrays;
-import java.util.Map;
-
-
 import com.atguigu.core.bean.PageVo;
+import com.atguigu.core.bean.Query;
 import com.atguigu.core.bean.QueryCondition;
 import com.atguigu.core.bean.Resp;
+import com.atguigu.gmall.pms.entity.SpuInfoEntity;
+import com.atguigu.gmall.pms.service.SpuInfoService;
+import com.atguigu.gmall.pms.vo.SpuInfoVO;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import com.atguigu.gmall.pms.entity.SpuInfoEntity;
-import com.atguigu.gmall.pms.service.SpuInfoService;
-
-
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -30,8 +31,24 @@ import com.atguigu.gmall.pms.service.SpuInfoService;
 @RestController
 @RequestMapping("pms/spuinfo")
 public class SpuInfoController {
+
     @Autowired
     private SpuInfoService spuInfoService;
+
+    @Autowired
+    private AmqpTemplate amqpTemplate;
+
+    @GetMapping
+    public Resp<PageVo> querySpuByCidOrKey(QueryCondition queryCondition,@RequestParam(value = "catId",defaultValue = "0")Long catId) {
+        PageVo pageVo = spuInfoService.querySpuByCidOrKey(queryCondition,catId);
+        return Resp.ok(pageVo);
+    }
+
+    @PostMapping("page")
+    public Resp<List<SpuInfoEntity>> querySpuByPage(@RequestBody QueryCondition queryCondition) {
+        IPage<SpuInfoEntity> page =  spuInfoService.page(new Query<SpuInfoEntity>().getPage(queryCondition),new QueryWrapper<SpuInfoEntity>().eq("publish_status","1"));
+        return Resp.ok(page.getRecords());
+    }
 
     /**
      * 列表
@@ -64,9 +81,8 @@ public class SpuInfoController {
     @ApiOperation("保存")
     @PostMapping("/save")
     @PreAuthorize("hasAuthority('pms:spuinfo:save')")
-    public Resp<Object> save(@RequestBody SpuInfoEntity spuInfo){
-		spuInfoService.save(spuInfo);
-
+    public Resp<Object> save(@RequestBody SpuInfoVO spuInfoVO){
+		spuInfoService.bigSave(spuInfoVO);
         return Resp.ok(null);
     }
 
@@ -78,6 +94,8 @@ public class SpuInfoController {
     @PreAuthorize("hasAuthority('pms:spuinfo:update')")
     public Resp<Object> update(@RequestBody SpuInfoEntity spuInfo){
 		spuInfoService.updateById(spuInfo);
+
+		amqpTemplate.convertAndSend("GMALL-PMS-EXCHANGE","item.update",spuInfo.getId());
 
         return Resp.ok(null);
     }

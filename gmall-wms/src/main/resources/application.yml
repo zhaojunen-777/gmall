@@ -11,5 +11,11 @@ spring:
     password: rootroot
   redis:
     host: 192.168.11.128
+
+  rabbitmq:
+    host: 192.168.11.128
+    virtual-host: /zhaojunen
+    username: zhaojunen
+    password: zhaojunen
 mybatis-plus:
   mapper-locations: classpath:mapper/wms/**/*.xml

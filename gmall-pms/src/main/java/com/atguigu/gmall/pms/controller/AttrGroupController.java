@@ -1,20 +1,20 @@
 package com.atguigu.gmall.pms.controller;
 
-import java.util.Arrays;
-import java.util.Map;
-
-
 import com.atguigu.core.bean.PageVo;
 import com.atguigu.core.bean.QueryCondition;
 import com.atguigu.core.bean.Resp;
+import com.atguigu.gmall.pms.entity.AttrGroupEntity;
+import com.atguigu.gmall.pms.service.AttrGroupService;
+import com.atguigu.gmall.pms.vo.GroupVO;
+import com.atguigu.gmall.pms.vo.ItemGroupVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import com.atguigu.gmall.pms.entity.AttrGroupEntity;
-import com.atguigu.gmall.pms.service.AttrGroupService;
+import java.util.Arrays;
+import java.util.List;
 
 
 
@@ -32,6 +32,31 @@ import com.atguigu.gmall.pms.service.AttrGroupService;
 public class AttrGroupController {
     @Autowired
     private AttrGroupService attrGroupService;
+
+    @GetMapping("withattrvalues")
+    public Resp<List<ItemGroupVO>> queryItemGroupByCidAndSpuId(
+            @RequestParam("cid")Long cid,
+            @RequestParam("spuId")Long spuId){
+        List<ItemGroupVO> itemGroupVOS = attrGroupService.queryItemGroupByCidAndSpuId(cid,spuId);
+        return Resp.ok(itemGroupVOS);
+    }
+
+    @GetMapping("withattrs/cat/{catId}")
+    public Resp<List<GroupVO>> queryGroupVOsByCid(@PathVariable("catId")Long catId) {
+        List<GroupVO> groupVOS = attrGroupService.queryGroupVOsByCid(catId);
+        return Resp.ok(groupVOS);
+    }
+    @GetMapping("withattr/{gid}")
+    public Resp<GroupVO> queryGroupVOByGid(@PathVariable("gid")Long gid) {
+        GroupVO groupVO = attrGroupService.queryGroupVOByGid(gid);
+        return Resp.ok(groupVO);
+    }
+
+    @GetMapping("{catId}")
+    public Resp<PageVo> queryGroupsByCidPage(QueryCondition queryCondition,@PathVariable("catId")Long catId) {
+        PageVo pageVo = attrGroupService.queryGroupsByCidPage(queryCondition,catId);
+        return Resp.ok(pageVo);
+    }
 
     /**
      * 列表

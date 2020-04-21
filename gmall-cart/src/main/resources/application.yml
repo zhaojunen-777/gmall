@@ -1,0 +1,23 @@
+server:
+  port: 8090
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+  redis:
+    host: 192.168.11.128
+
+  rabbitmq:
+    host: 192.168.11.128
+    virtual-host: /zhaojunen
+    username: zhaojunen
+    password: zhaojunen
+
+jwt:
+  token:
+    pubKeyPath: D:\git\gmall\rsa\rsa.pub
+    userKeyName: user-key # \u672A\u767B\u5F55\u8D2D\u7269\u8F66\u7684\u552F\u4E00\u6807\u8BC6
+    cookieName: gmall-token
+    expireTime: 7776000
+
